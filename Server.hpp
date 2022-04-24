@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,11 +18,18 @@ class Server {
 		~Server();
 		void createSocket();
 		void bindSocket();
+		void listenSocket();
+		void acceptConnection(); 
 		void deleteSocket();
 
-
 	private:
+		enum mErrors {
+			createSocketError,
+			bindError;
+		};
+		void 		fatalError(std::string const & errorMessage);
 		sockaddr_in mSockAddr;
 		int 		mSockFd;
-
+		int			mPort;
+		in_addr_t	mIP;
 };
