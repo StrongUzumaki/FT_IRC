@@ -10,6 +10,17 @@
 #include <netinet/in.h>
 
 class Server {
+	private:
+		enum mErrors {
+			createSocketError,
+			bindError,
+			listenSocketError
+		};
+		void handleError(mErrors Error);
+		sockaddr_in mSockAddr;
+		int 		mSockFd;
+		int			mPort;
+		in_addr_t	mIP;
 	
 	public:
 		Server();
@@ -22,14 +33,4 @@ class Server {
 		void acceptConnection(); 
 		void deleteSocket();
 
-	private:
-		enum mErrors {
-			createSocketError,
-			bindError;
-		};
-		void 		fatalError(std::string const & errorMessage);
-		sockaddr_in mSockAddr;
-		int 		mSockFd;
-		int			mPort;
-		in_addr_t	mIP;
 };

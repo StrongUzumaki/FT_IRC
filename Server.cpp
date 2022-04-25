@@ -17,19 +17,25 @@ Server::~Server() {
 
 }
 
-void	Server::fatalError(std::string const & errorMessage) {
-	switch{
-		case bindError
-		std::cerr << errorMessage << std::endl;
-	
-	bindError << "Failed to bind to port " << mPort << ". Errno: " << errno).str()
+void	Server::handleError(mErrors Error) {
+	switch (Error) {
+		case createSocketError:
+			std::cerr << "Can't create a socket." << std::endl;
+			break;
+		case bindError:
+			std::cerr << "Can't connect to port " << mPort << ". Errno: " << errno << std::endl;
+			break;
+		case listenSocketError:
+			std::cerr << "Failed to listen to socket. Errno: " << errno << std::endl;
+			break; 
+	}
 	exit(-1);
 }
 
 void	Server::createSocket() {
 	mSockFd = socket(AF_INET, SOCK_STREAM, 0); 
 	if (mSockFd < 0)
-		fatalError("Can't create a socket.");
+		handleError(createSocketError);
 }
 
 void	Server::bindSocket() {
@@ -39,8 +45,18 @@ void	Server::bindSocket() {
 	mSockAddr.sin_addr.s_addr = mIP;
 	mSockAddr.sin_port = htons(mPort);
 	if (bind(mSockFd, (struct sockaddr*)&mSockAddr, sizeof(sockaddr)) < 0) {
-		fatalError(bindError);
+		handleError(bindError);
 	}
+}
+
+void	Server::listenSocket() {
+	if (listen(mSockFd, 128) < 0)
+		handleError(listenSocketError);
+}
+
+void Server::acceptConnection() {
+	size_t addrlen = sizeof(mSockAddr);
+	int clientSocket = accept(mSockFd, (struct sockaddr*)&mSockAddr, (socklen_t*)&addrlen);
 }
 
 void	Server::deleteSocket() {
