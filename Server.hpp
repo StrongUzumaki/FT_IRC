@@ -41,21 +41,6 @@ public:
 };
 
 class Server {
-<<<<<<< HEAD
-=======
-	private:
-		enum mErrors {
-			createSocketError,
-			bindError,
-			listenSocketError
-		};
-		void handleError(mErrors Error);
-		sockaddr_in mSockAddr;
-		int 		mSockFd;
-		int			mPort;
-		in_addr_t	mIP;
-	
->>>>>>> 22f2647277a9c07bfa713cc6c298925d50a60ba6
 	public:
 		Server(int port, std::string password);
 		~Server();
@@ -73,7 +58,6 @@ class Server {
 		Server();
 		Server(Server const & src);
 		Server & operator=(Server const & src);
-<<<<<<< HEAD
 		enum mErrors {
 			createSocketError,
 			bindError
@@ -93,13 +77,10 @@ class Server {
 
 		struct pollfd getFD(int i) const { return mUserDB.getFD[i]; }
 		User* getUser(int i) const { return mUserDB.getUser[i]; }
-=======
 		~Server();
 		void createSocket();
 		void bindSocket();
 		void listenSocket();
 		void acceptConnection(); 
 		void deleteSocket();
-
->>>>>>> 22f2647277a9c07bfa713cc6c298925d50a60ba6
 };

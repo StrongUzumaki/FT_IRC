@@ -19,7 +19,6 @@ Server::~Server() {
 
 }
 
-<<<<<<< HEAD
 void	Server::fatalError(mErrors Error) {
 	switch (Error) {
 		case bindError:
@@ -31,31 +30,12 @@ void	Server::fatalError(mErrors Error) {
 		default:
 			exit(EXIT_FAILURE);
 	}	
-=======
-void	Server::handleError(mErrors Error) {
-	switch (Error) {
-		case createSocketError:
-			std::cerr << "Can't create a socket." << std::endl;
-			break;
-		case bindError:
-			std::cerr << "Can't connect to port " << mPort << ". Errno: " << errno << std::endl;
-			break;
-		case listenSocketError:
-			std::cerr << "Failed to listen to socket. Errno: " << errno << std::endl;
-			break; 
-	}
-	exit(-1);
->>>>>>> 22f2647277a9c07bfa713cc6c298925d50a60ba6
 }
 
 void	Server::createSocket() {
 	mSockFd = socket(AF_INET, SOCK_STREAM, 0); 
 	if (mSockFd < 0)
-<<<<<<< HEAD
 		fatalError(createSocketError);
-=======
-		handleError(createSocketError);
->>>>>>> 22f2647277a9c07bfa713cc6c298925d50a60ba6
 }
 
 void	Server::bindSocket() {
@@ -65,23 +45,16 @@ void	Server::bindSocket() {
 	mSockAddr.sin_addr.s_addr = mIP;
 	mSockAddr.sin_port = htons(mPort);
 	if (bind(mSockFd, (struct sockaddr*)&mSockAddr, sizeof(sockaddr)) < 0) {
-		handleError(bindError);
+		fatalError(bindError);
 	}
 }
 
-void	Server::listenSocket() {
-	if (listen(mSockFd, 128) < 0)
-		handleError(listenSocketError);
-}
 
-void Server::acceptConnection() {
-	size_t addrlen = sizeof(mSockAddr);
-	int clientSocket = accept(mSockFd, (struct sockaddr*)&mSockAddr, (socklen_t*)&addrlen);
-}
 
 void	Server::deleteSocket() {
-
 }
+
+
 
 
 void 	Server::acceptConnection() {
@@ -101,6 +74,11 @@ void 	Server::acceptConnection() {
 	mUserDB.addUser(pfd, new User(host, mServerName));
 }
 
+void	Server::listenSocket() {
+	if (listen(mSockFd, 128) < 0)
+		;//fatalError(listenSocketError);
+}
+
 void 	Server::processMessage() {
 	auto	FDs = mUserDB.getFDs();
 	int		pollfd_num = poll(FDs.data(), FDs.size(), 1);
@@ -108,7 +86,7 @@ void 	Server::processMessage() {
 	if (pollfd_num > 0) {
 		for (int i=0; mUserDB.size(); i++) {
 			if (getFD(i).revents & POLLIN) {
-				sendMessage
+				;//sendMessage
 			}
 		}
 	}
