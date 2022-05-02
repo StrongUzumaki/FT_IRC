@@ -34,6 +34,38 @@ bool Connector::bindSocket() {
 	return bound;
 }
 
-void deleteSocket() {
+bool Connector::listenSocket() {
+	return listen(mFD, 128) == 0;
+}
+
+void Connector::deleteSocket() {
 	// TODO ;)
+}
+
+struct pollfd Connector::acceptConnection() {
+	struct pollfd pfd = { .fd = 0,
+						  .events = 0,
+						  .revents = 0
+	};
+	size_t addrlen = sizeof(mAddr);
+	int connection = accept(mFD,
+							(struct sockaddr *) &mAddr,
+							(socklen_t *) &addrlen
+	);
+	if (connection < 1)
+		return pfd;
+	// char host[INET_ADDRSTRLEN];
+	// inet_ntop(AF_INET, &(mAddr.sin_addr), host, INET_ADDRSTRLEN);
+	pfd.fd = connection;
+	pfd.events = POLLIN;
+	pfd.revents = 0;
+	// mUsers.push_back(new User(connection, pfd, host, mServerName));
+	// mUserDB.addUser(pfd, new User(host, mServerName));
+	return pfd;
+}
+
+User*	Connector::registerUser(const struct pollfd& pfd) {
+	char host[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &mAddr.sin_addr, host, INET_ADDRSTRLEN);
+	return new User(host, mName);
 }

@@ -7,6 +7,8 @@
 using std::begin;
 using std::end;
 
+typedef std::pair<User *, struct pollfd> UBinding;
+
 class Database {
 private:
 	std::vector<User *>	mUsers;
@@ -16,7 +18,7 @@ public:
 	~Database() {}
 	
 // getters 
-	std::pair<User *, struct pollfd> getPair(size_t idx) const {
+	UBinding getBinding(size_t idx) const {
 		User* user = mUsers.at(idx);
 		struct pollfd fd = mFds.at(idx);
 		return std::make_pair(user, fd);
@@ -34,6 +36,10 @@ public:
 	void /* bool? */ addUser(User* user, struct pollfd fd) {
 		mUsers.push_back(user);
 		mFds.push_back(fd);
+	}
+
+	void /* bool? */ addUser(const UBinding& p) {
+		return addUser(p.first, p.second);
 	}
 
 	void /* bool? */ removeUser(size_t idx) {
