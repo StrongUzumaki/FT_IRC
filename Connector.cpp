@@ -1,36 +1,21 @@
 #include "Connector.hpp"
 
-Connector::Connector(int port, const std::string& pass, time_t timeout)
-	: mPort(port),
-	mPass(/* hash */ pass),
-	mIP(inet_addr("127.0.0.1"))
+Connector::Connector(int port, const std::string& pass, time_t timeout = 0)
+	:
+	mIP(inet_addr("127.0.0.1")),
+	mPort(port),
+	mPass(/* hash */ pass)
 {
-
 	if (!createSocket())
 		throw std::runtime_error("Couldn't create a socket:(");
 	if (bindSocket())
 		throw std::runtime_error(strerror(errno));
 	if (listenSocket())
 		throw std::runtime_error(strerror(errno));
-	//time_t i;
-	//for (i = 0; !createSocket() && i < timeout;)
-	//	++i;
-	//if (i == timeout)
-	//	throw std::runtime_error("Couldn't create a socket:(");
-	//if (bind < 0)
-	//	throw std::runtime_error("Couldn't bind the socket:(");
-
-	//for (i = 0; !!bindSocket() && i < timeout;)
-	//	++i;
-	//if (i == timeout) {
-	//	deleteSocket();
-	//	throw std::runtime_error("Couldn't bind the socket:(");
-//	}
 }
 
 
 void Connector::operator()() {
-
 	while(1) {
 		acceptConnection();
 		listenConnection();
@@ -89,11 +74,28 @@ struct pollfd Connector::acceptConnection() {
 	return pfd;
 }
 
+static void reaaad(struct pollfd pfd) {
+	char buf[100];
+	int bytesRead;
+	std::string text;
+	while ((bytesRead = recv(pfd.fd, buf, 99, 0)) > 0)
+	{
+		buf[bytesRead] = 0;
+		text += buf;
+		buf[0] = 0;
+		if (text.find('\n') != std::string::npos)
+			break;
+	}
+	std::cout << text << std::endl;
+}
+
 void Connector::listenConnection() {
 	int revents = poll((struct pollfd*)mDB.getFDs().data(), mDB.getFDs().size(), 1);
 	if (revents > 0) {
 		for (size_t i = 0; i < mDB.getUsers().size(); i++) {
-			mMessenger
+			if (mDB.getFd(i).revents & POLLIN) {
+				reaaad(mDB.getFd(i));
+			}
 		}	
 	}
 }
