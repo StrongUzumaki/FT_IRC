@@ -25,8 +25,5 @@ public:
 	bool send(/* ... */); // sends data to connections
 
 	// ...
-	
-	IRC() {} // RAII !
-
 };
 
