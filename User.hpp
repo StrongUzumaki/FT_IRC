@@ -2,8 +2,6 @@
 #include <iostream>
 
 class User {
-	public:
-		User(std::string const & host, std::string &const servername);
-
-
-}
+public:
+	User(const std::string& host, const std::string& servername);
+};
