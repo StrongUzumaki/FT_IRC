@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include "User.hpp"
+#include "Database.hpp"
 
 // IDEA!
 // if the OS fails to give us a socket, we should try again for some time
@@ -28,8 +29,13 @@ private: // fields
 	int			mPort;
 	std::string	mPass;
 	std::string mName;
+	Database	mDB;
+	std::string mServerName;
+	sockaddr_in		mSockAddr;
+	
 public:
 	explicit Connector(int port, const std::string& pass, time_t timeout); // HASH THE PWD
+	void operator()();
 																		  // think about the timeout
 	~Connector();
 private:
@@ -40,6 +46,7 @@ private:
 
 	struct pollfd acceptConnection();
 	User* registerUser(const struct pollfd& pfd);
+	void listenConnection();
 
 	bool checkConnection();
 };

@@ -31,6 +31,8 @@ public:
 	struct pollfd getFd(size_t idx) const {
 		return mFds.at(idx);
 	}
+	const std::vector<struct pollfd>& getFDs() const { return mFds; }
+	const std::vector<User *> getUsers() const { return mUsers; }
 
 // add/remove user 
 	void /* bool? */ addUser(User* user, struct pollfd fd) {

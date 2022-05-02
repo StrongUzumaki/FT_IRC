@@ -2,7 +2,8 @@
 
 Connector::Connector(int port, const std::string& pass, time_t timeout)
 	: mPort(port),
-	mPass(/* hash */ pass)
+	mPass(/* hash */ pass),
+	mIP(inet_addr("127.0.0.1"))
 {
 	time_t i;
 	for (i = 0; !createSocket() && i < timeout;)
@@ -14,6 +15,15 @@ Connector::Connector(int port, const std::string& pass, time_t timeout)
 	if (i == timeout) {
 		deleteSocket();
 		throw std::runtime_error("Couldn't bind the socket:(");
+	}
+}
+
+
+void Connector::operator()() {
+
+	while(1) {
+		acceptConnection();
+		listenConnection();
 	}
 }
 
@@ -43,6 +53,8 @@ void Connector::deleteSocket() {
 }
 
 struct pollfd Connector::acceptConnection() {
+	char	host[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &(mSockAddr.sin_addr), host, INET_ADDRSTRLEN);
 	struct pollfd pfd = { .fd = 0,
 						  .events = 0,
 						  .revents = 0
@@ -59,9 +71,13 @@ struct pollfd Connector::acceptConnection() {
 	pfd.fd = connection;
 	pfd.events = POLLIN;
 	pfd.revents = 0;
-	// mUsers.push_back(new User(connection, pfd, host, mServerName));
-	// mUserDB.addUser(pfd, new User(host, mServerName));
+	mDB.addUser(new User(host, mServerName), pfd);
 	return pfd;
+}
+
+void Connector::listenConnection() {
+	int revents = poll((struct pollfd*)mDB.getFDs().data(), mDB.getFDs().size(), 1);
+
 }
 
 User*	Connector::registerUser(const struct pollfd& pfd) {
@@ -69,3 +85,4 @@ User*	Connector::registerUser(const struct pollfd& pfd) {
 	inet_ntop(AF_INET, &mAddr.sin_addr, host, INET_ADDRSTRLEN);
 	return new User(host, mName);
 }
+
